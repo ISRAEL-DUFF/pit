@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Personal Income Tax
+        </title>
+    </head>
+
+    <body>
+        <h3>Schoolable Personal Income Tax POC</h3>
+
+        <div style="width: 400px; margin-left: auto; margin-right: auto;">
+            <input type="number" id = 'A' value = '0'/>
+            <br><br>
+            <div>
+                <label>
+                    Pension
+                    <input type = 'checkbox' id = 'c1' onclick="changeExemption('c1')">
+                </label><br><br>
+
+                <label>
+                    NHF <input type = 'checkbox' id = 'c2' onclick="changeExemption('c2')">
+                </label><br><br>
+                <label>
+                    <input type = 'checkbox' id = 'c3' onclick="changeExemption('c3')"> NHIS
+                </label> <br><br>           </div>
+            <button onclick="calculate()">
+                Calculate
+            </button>
+        </div>
+    </body>
+
+
+    <script>
+        // Example POST method implementation:
+        async function postData(url = '', data = {}) {
+        // Default options are marked with *
+        const response = await fetch(url, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(data) // body data type must match "Content-Type" header
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
+        }
+
+
+        let exemptions = {
+            'c1': 0,
+            'c2': 0,
+            'c3': 0
+        }
+
+
+        function calculate() {
+            console.log('Calculating...')
+            let a = document.getElementById('A').value
+            postData('/tax', { A: a, exemptions: exemptions })
+            .then(data => {
+                console.log(data); // JSON data parsed by `data.json()` call
+            });
+        }
+
+        function changeExemption(v) {
+          let isChecked = document.getElementById(v).checked;
+           if(isChecked) {
+            exemptions[v] = 1
+           } else {
+               exemptions[v] = 0
+           }
+            console.log('Value: ',exemptions)
+        }
+    </script>
+</html>
