@@ -31,7 +31,9 @@ export class IncomeTaxService {
     }
 
     computeTaxableIncome(grossIncome:number, b:number[]): number {
-        return grossIncome - (this.exemptionDeduction(grossIncome, b) + this.cra(grossIncome))
+        let exemptionsAndCRA = (this.exemptionDeduction(grossIncome, b) + this.cra(grossIncome));
+        if(grossIncome < exemptionsAndCRA) return grossIncome
+        return grossIncome - exemptionsAndCRA
     }
 
     computeAnualTaxPerAnum(grossIncome:number, b:number[]): number {

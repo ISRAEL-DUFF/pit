@@ -7,9 +7,10 @@
     </head>
 
     <body>
-        <h3>Schoolable Personal Income Tax POC</h3>
 
         <div style="width: 400px; margin-left: auto; margin-right: auto;">
+            <h3>Schoolable Personal Income Tax POC</h3>
+
             <input type="number" id = 'A' value = '0'/>
             <br><br>
             <div>
@@ -19,14 +20,23 @@
                 </label><br><br>
 
                 <label>
-                    NHF <input type = 'checkbox' id = 'c2' onclick="changeExemption('c2')">
+                    NHF
+                    <input type = 'checkbox' id = 'c2' onclick="changeExemption('c2')">
                 </label><br><br>
                 <label>
-                    <input type = 'checkbox' id = 'c3' onclick="changeExemption('c3')"> NHIS
+                    NHIF
+                    <input type = 'checkbox' id = 'c3' onclick="changeExemption('c3')">
                 </label> <br><br>           </div>
             <button onclick="calculate()">
                 Calculate
             </button>
+
+
+            <div>
+                <h4 id = 'cra' style='color: orangered'></h5>
+                <h4 id = 'taxableIncome' style='color: blue'></h5>
+                <h2 id = 'monthlyTax' style='color: green'></h5>
+            </div>
         </div>
     </body>
 
@@ -62,9 +72,18 @@
         function calculate() {
             console.log('Calculating...')
             let a = document.getElementById('A').value
-            postData('/tax', { A: a, exemptions: exemptions })
+            postData('/tax/per/anum', { grossIncome: a, exemptions: [exemptions['c1'], exemptions['c2'], exemptions['c3']] })
             .then(data => {
+                let formater = Intl.NumberFormat('en-US', {
+                    // style: 'currency',
+                    // currency: 'NGN',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 3
+                });
                 console.log(data); // JSON data parsed by `data.json()` call
+                document.getElementById('cra').innerHTML = 'CRA: ' + formater.format(data.cra)
+                document.getElementById('taxableIncome').innerHTML = 'Total Taxable Income: ' + formater.format(data.totalTaxableIncome)
+                document.getElementById('monthlyTax').innerHTML = 'Monthly Tax: ' + formater.format(data.monthlyTax)
             });
         }
 
