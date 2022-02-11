@@ -2,9 +2,14 @@ import { Body, Controller, Get, Post } from "@nestjs/common";
 import { IncomeTaxService } from "./income-tax.service";
 import { computeIncomeDto, ResponseDto } from "./dto/income.dto";
 
+import { InjectRepository} from "@mikro-orm/nestjs";
+import { QueryOrder, wrap } from '@mikro-orm/core'
+import { PayBreakdown } from "src/entities/PayBreakdown";
+import { EntityRepository } from "@mikro-orm/mysql";
+
 @Controller('tax')
 export class IncomeTaxController {
-    constructor(private incomeTaxService: IncomeTaxService) {}
+    constructor(private incomeTaxService: IncomeTaxService, @InjectRepository(PayBreakdown) private readonly payBreakdown: EntityRepository<PayBreakdown>) {}
     @Post()
     incomeTax(@Body() body: any): number {
         // console.log('BODY:', body)
@@ -22,5 +27,25 @@ export class IncomeTaxController {
             computeAnualTaxPerAnum(body.grossIncome, body.exemptions)
         }
         // return this.incomeTaxService.computeAnualTaxPerAnum(3000000, [1, 1, 1]);
+    }
+
+
+    // @Post()
+    // async create(@Body() body: any) {
+    //     if (!body.name || !body.email) {
+    //     throw new HttpException('One of `name, email` is missing', HttpStatus.BAD_REQUEST);
+    //     }
+
+    //     const author = new Author(body.name, body.email);
+    //     wrap(author).assign(body);
+    //     await this.authorRepository.persist(author);
+
+    //     return author;
+    // }
+
+
+    @Get('test') 
+    async testDb(): Promise<PayBreakdown[]> {
+        return this.payBreakdown.findAll()
     }
 }
