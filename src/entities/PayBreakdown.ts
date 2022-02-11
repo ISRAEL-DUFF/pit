@@ -8,4 +8,10 @@ export class PayBreakdown extends BaseEntity{
 
     @Property()
     amount!: number
+
+    constructor(description: String, amount: number) {
+        super();
+        this.amount = amount;
+        this.description = description;
+    }
 }

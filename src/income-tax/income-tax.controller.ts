@@ -9,7 +9,7 @@ import { EntityRepository } from "@mikro-orm/mysql";
 
 @Controller('tax')
 export class IncomeTaxController {
-    constructor(private incomeTaxService: IncomeTaxService, @InjectRepository(PayBreakdown) private readonly payBreakdown: EntityRepository<PayBreakdown>) {}
+    constructor(private incomeTaxService: IncomeTaxService, @InjectRepository(PayBreakdown) private readonly payBreakdownRepository: EntityRepository<PayBreakdown>) {}
     @Post()
     incomeTax(@Body() body: any): number {
         // console.log('BODY:', body)
@@ -20,6 +20,9 @@ export class IncomeTaxController {
 
     @Post('per/anum')
     incomeTaxPerAnum(@Body() body: computeIncomeDto): ResponseDto {
+        const payBreakdown = new PayBreakdown("Test Breakdonw", 4000);
+        wrap(payBreakdown).assign(payBreakdown);
+        this.payBreakdownRepository.persist(payBreakdown);
         return {
             cra: this.incomeTaxService.cra(body.grossIncome),
             totalTaxableIncome: this.incomeTaxService.computeTaxableIncome(body.grossIncome, body.exemptions),
@@ -46,6 +49,6 @@ export class IncomeTaxController {
 
     @Get('test') 
     async testDb(): Promise<PayBreakdown[]> {
-        return this.payBreakdown.findAll()
+        return this.payBreakdownRepository.findAll()
     }
 }
