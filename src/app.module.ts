@@ -16,7 +16,8 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
     entities: ['./dist/entities'],
     entitiesTs: ['./src/entities'],
     dbName: 'mkro_orm_db',
-    password: 'mysql',
+    // password: 'mysql',
+    password: 'mr cheat',
     type:'mysql'
   })],
   controllers: [AppController],

@@ -19,10 +19,18 @@ export class IncomeTaxController {
     }
 
     @Post('per/anum')
-    incomeTaxPerAnum(@Body() body: computeIncomeDto): ResponseDto {
+    async incomeTaxPerAnum(@Body() body: computeIncomeDto): Promise<ResponseDto> {
         const payBreakdown = new PayBreakdown("Test Breakdonw", 4000);
+
+        // persist 
         wrap(payBreakdown).assign(payBreakdown);
-        this.payBreakdownRepository.persist(payBreakdown);
+        await this.payBreakdownRepository.persistAndFlush(payBreakdown);
+
+        // or do it like this
+        // await this.payBreakdownRepository.persist(payBreakdown)
+        // await this.payBreakdownRepository.flush()
+
+
         return {
             cra: this.incomeTaxService.cra(body.grossIncome),
             totalTaxableIncome: this.incomeTaxService.computeTaxableIncome(body.grossIncome, body.exemptions),
