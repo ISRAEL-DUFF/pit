@@ -1,34 +1,31 @@
-import { Property, Entity, OneToOne, OneToMany, Collection } from "@mikro-orm/core";
+import { Property, Entity, OneToOne, OneToMany, Collection, ManyToOne } from "@mikro-orm/core";
+import { PayslipInput } from "../common/data.input";
 import { BaseEntity } from "./BaseEntity";
-import { Beneficiary } from "./Beneficiary";
+import { PayrollBeneficiary } from "./PayrollBeneficiary";
 import { PayBreakdown } from "./PayBreakdown";
+import { Payroll } from "./Payroll";
 
 @Entity()
 export class Payslip extends BaseEntity {
+    @ManyToOne(() => Payroll)
+    payroll: Payroll
+
+    @OneToMany(() => PayBreakdown, payBreakdown => payBreakdown.payslip)
+    salaryBreakdown = new Collection<PayBreakdown>(this)
+
+    @OneToOne(() => PayrollBeneficiary, payrollBeneficiary => payrollBeneficiary.payslip, {owner: true, orphanRemoval: true})
+    payrollBeneficiary: PayrollBeneficiary
+
     @Property()
-    grossPay: number;
+    grossPay!: number;
 
     @Property()
     netPay!: number;
 
-    // @Property()
-    // beneficiaryId: number;
-
-    @Property()
-    payrollId: number;
-
-    @OneToMany(() => PayBreakdown, payBreakdown => payBreakdown.id)
-    salaryBreakdown = new Collection<PayBreakdown>(this)
-
-    @OneToOne(() => Beneficiary, beneficiary => beneficiary.id, {owner: true, orphanRemoval: true})
-    beneficiary: Beneficiary
-
-
-    constructor(grossPay: number, 
-        payrollId: number, beneficiary: Beneficiary) {
+    constructor({grossPay, payroll, payrollBeneficiary}: PayslipInput) {
         super()
         this.grossPay = grossPay
-        this.payrollId = payrollId
-        this.beneficiary = beneficiary
+        this.payroll = payroll
+        this.payrollBeneficiary = payrollBeneficiary
     }
 }

@@ -1,31 +1,43 @@
-import { Property, Entity, OneToOne, OneToMany, Collection } from "@mikro-orm/core";
+import { Property, Entity, OneToOne, OneToMany, Collection, ManyToOne } from "@mikro-orm/core";
+import { PayrollInput } from "../common/data.input";
 import { BaseEntity } from "./BaseEntity";
 import { Payslip } from "./Payslip";
+import { PayrollReport } from "./PayrollReport";
 
 @Entity()
 export class Payroll extends BaseEntity {
+    @OneToMany(() => Payslip, payslip => payslip.payroll)
+    payslips = new Collection<Payslip>(this)
+
+    @ManyToOne()
+    report?: PayrollReport
+
     @Property()
-    organisationWalletId: number;
-
-    // @Property()
-    // reportId: number
-
+    organisationWalletId!: String;
+ 
     @Property()
     executed = false;
 
     @Property()
-    dateGenerated: Date
+    payrollYear!: String
 
     @Property()
-    payrollYear: String
+    payrollMonth!: String
+
+    // mini payroll summary
+    @Property()
+    totalNumberOfEmployees: number
 
     @Property()
-    payrollMonth: String
+    totalGrossSalary: number
 
-    @OneToMany(() => Payslip, payslip => payslip.id)
-    payslips = new Collection<Payslip>(this)
+    @Property()
+    totalNetSalary: number
 
-    constructor() {
+    constructor(payroll: PayrollInput) {
         super()
+        this.organisationWalletId = payroll.organisationalWalletId
+        this.payrollMonth = payroll.payrollMonth
+        this.payrollYear = payroll.payrollYear
     }
 }

@@ -3,13 +3,13 @@ import { BaseEntity } from "./BaseEntity";
 import { Payroll } from "./Payroll";
 
 @Entity()
-export class Report extends BaseEntity {
-    @Property()
-    dateGenerated: Date
-
-    @Property()
-    description: String
-
-    @OneToMany(() => Payroll, payroll => payroll.id)
+export class PayrollReport extends BaseEntity {
+    @OneToMany(() => Payroll, payroll => payroll.report)
     payroll = new Collection<Payroll>(this)
+    
+    @Property()
+    description?: String
+
+    @Property()
+    reported = false
 }

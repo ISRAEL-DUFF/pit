@@ -5,26 +5,29 @@ import { computeIncomeDto, ResponseDto } from "./dto/income.dto";
 import { InjectRepository} from "@mikro-orm/nestjs";
 import { QueryOrder, wrap } from '@mikro-orm/core'
 import { PayBreakdown } from "src/entities/PayBreakdown";
-import { EntityRepository } from "@mikro-orm/mysql";
+import { EntityManager, EntityRepository } from "@mikro-orm/mysql";
+import { BeneficiaryInput } from "src/common/data.input";
+import { PayrollBeneficiary } from "src/entities/PayrollBeneficiary";
 
 @Controller('tax')
 export class IncomeTaxController {
-    constructor(private incomeTaxService: IncomeTaxService, @InjectRepository(PayBreakdown) private readonly payBreakdownRepository: EntityRepository<PayBreakdown>) {}
+    constructor(private incomeTaxService: IncomeTaxService, private readonly em: EntityManager, @InjectRepository(PayBreakdown) private readonly payBreakdownRepository: EntityRepository<PayBreakdown>) {}
     @Post()
     incomeTax(@Body() body: any): number {
-        // console.log('BODY:', body)
         let b = [body.exemptions['c1'], body.exemptions['c2'], body.exemptions['c3']]
-        // return this.incomeTaxService.computeTaxableIncome(3000000, [1, 1, 1]);
         return this.incomeTaxService.computeTaxableIncome(body.a, b);
     }
 
     @Post('per/anum')
     async incomeTaxPerAnum(@Body() body: computeIncomeDto): Promise<ResponseDto> {
-        const payBreakdown = new PayBreakdown("Test Breakdonw", 4000);
+        // const payBreakdown = new PayBreakdown({
+        //     description: "Test Breakdonw", 
+        //     amount: 4000
+        // });
 
-        // persist 
-        wrap(payBreakdown).assign(payBreakdown);
-        await this.payBreakdownRepository.persistAndFlush(payBreakdown);
+        // // persist 
+        // wrap(payBreakdown).assign(payBreakdown);
+        // await this.payBreakdownRepository.persistAndFlush(payBreakdown);
 
         // or do it like this
         // await this.payBreakdownRepository.persist(payBreakdown)
@@ -35,24 +38,36 @@ export class IncomeTaxController {
             cra: this.incomeTaxService.cra(body.grossIncome),
             totalTaxableIncome: this.incomeTaxService.computeTaxableIncome(body.grossIncome, body.exemptions),
             monthlyTax: this.incomeTaxService.
-            computeAnualTaxPerAnum(body.grossIncome, body.exemptions)
+            computeAnualTaxPerMonth(body.grossIncome, body.exemptions)
         }
-        // return this.incomeTaxService.computeAnualTaxPerAnum(3000000, [1, 1, 1]);
     }
 
+    @Post('beneficiary')
+    async addBeneficiary(@Body() beneficiary: BeneficiaryInput): Promise<any> {
+        const newBeneficiary = new PayrollBeneficiary(beneficiary)
+        newBeneficiary.optInNhf = true
+        newBeneficiary.optInPension = true;
+        this.em.fork().persistAndFlush(newBeneficiary);
 
-    // @Post()
-    // async create(@Body() body: any) {
-    //     if (!body.name || !body.email) {
-    //     throw new HttpException('One of `name, email` is missing', HttpStatus.BAD_REQUEST);
-    //     }
+        return {
+            success: true
+        }
+    }
 
-    //     const author = new Author(body.name, body.email);
-    //     wrap(author).assign(body);
-    //     await this.authorRepository.persist(author);
+    @Get('aggregate')
+    async computePayroll(): Promise<void> {
+        let payroll = await this.incomeTaxService.generatePayroll({
+            organisationalWalletId: 'org_5434',
+            payrollMonth: 'April',
+            payrollYear: '2017'
+        })
+        console.log('payroll:', payroll);
+    }
 
-    //     return author;
-    // }
+    @Post('execute')
+    async executePayroll(@Body() body: any ): Promise<any> {
+        let r = await this.incomeTaxService.executePayroll(body.payrollId)
+    }
 
 
     @Get('test') 

@@ -38,6 +38,37 @@
                 <h2 id = 'monthlyTax' style='color: green'></h5>
             </div>
         </div>
+
+
+        <div>
+            <input type = 'text' id="employeeId" placeholder="employeeId"/>
+            <input type = 'text' id="bankName" placeholder="bankName"/>
+            <input type = 'text' id="accountName" placeholder="Account Name"/><br><br>
+            <input type = 'text' id="accountNum" placeholder="Account Number" />
+            <input type = 'number' id="monthlySalary" placeholder="monthlySalary" />
+            <button onclick="addBeneficiary()">
+                Create Beneficiary
+            </button>
+        </div>
+
+
+        <div>
+            <br><br>
+            <input type = 'text' id="payrollId" placeholder="payrollId"/>
+            <button onclick="executePayroll()">
+                ExecutePayroll
+            </button>
+        </div>
+
+
+        <div>
+            <br><br>
+            <input type = 'text' id="tagName" placeholder="TagName" />
+            <input type = 'text' id="tagDescription" placeholder="tagDescription" />
+            <button onclick="createTag()">
+                Create Tag
+            </button>
+        </div>
     </body>
 
 
@@ -95,6 +126,47 @@
                exemptions[v] = 0
            }
             console.log('Value: ',exemptions)
+        }
+
+
+
+
+        function addBeneficiary() {
+            const accountName = document.getElementById('accountName').value;
+            const accountNum = document.getElementById('accountNum').value
+            const bankName = document.getElementById('bankName').value
+            const employeeWalletId = document.getElementById('employeeId').value
+            const monthlySalary = document.getElementById('monthlySalary').value
+
+            postData('/tax/beneficiary', {
+                accountName,
+                accountNum,
+                bankName,
+                employeeWalletId,
+                monthlySalary
+            }).then((resp) => {
+                console.log(resp)
+            })
+        }
+
+        function executePayroll() {
+            const payrollId = document.getElementById('payrollId').value;
+            postData('/tax/execute', {
+                payrollId
+            }).then((resp) => {
+                console.log(resp)
+            })
+        }
+
+        function createTag() {
+            const name = document.getElementById('tagName').value;
+            const description = document.getElementById('tagDescription').value;
+            postData('/group/create/tag', {
+                name,
+                description
+            }).then((resp) => {
+                console.log(resp)
+            })
         }
     </script>
 </html>
