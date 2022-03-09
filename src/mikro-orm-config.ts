@@ -26,25 +26,26 @@ const dbType: String = 'postgres';
 //   } as MigrationsOptions
 // }
 
-let mikroOrmConfig: Options<MySqlDriver> | Options<PostgreSqlDriver>;
+// let mikroOrmConfig: Options<MySqlDriver> | Options<PostgreSqlDriver>;
+let mikroOrmConfig: Options<PostgreSqlDriver>;
 
 if(dbType == 'mysql') {
-  mikroOrmConfig = {
-    logger: logger.log.bind(logger),
-    entities: ['./dist/entities'],
-    entitiesTs: ['./src/entities'],
-    dbName: 'mkro_orm_db',
-    password: 'mysql',
-    // password: 'mr cheat',
-    type:'mysql',
+  // mikroOrmConfig = {
+  //   logger: logger.log.bind(logger),
+  //   entities: ['./dist/entities'],
+  //   entitiesTs: ['./src/entities'],
+  //   dbName: 'mkro_orm_db',
+  //   password: 'mysql',
+  //   // password: 'mr cheat',
+  //   type:'mysql',
   
-    migrations: {
-      snapshot: false,
-      tableName: "_mikro_orm_migrations",
-      path: "src/migrations",
-      disableForeignKeys: false,
-    } as MigrationsOptions
-  } as Options<MySqlDriver>;
+  //   migrations: {
+  //     snapshot: false,
+  //     tableName: "_mikro_orm_migrations",
+  //     path: "src/migrations",
+  //     disableForeignKeys: false,
+  //   } as MigrationsOptions
+  // } as Options<MySqlDriver>;
 } else {
   mikroOrmConfig = {
     logger: logger.log.bind(logger),

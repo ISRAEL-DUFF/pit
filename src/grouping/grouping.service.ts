@@ -1,16 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { EntityManager } from "@mikro-orm/mysql";
-import { Populate } from "@mikro-orm/core";
 import { Tag as Group, ITagEntity, TagOptions, TagIntent, TagIntentOptions, mockTagNamesDb, mockTagsDb, IResolverFunction } from "./interfaces/tag";
 import { TagRoute } from '../entities/TagRoute.entity'
 import { Tag } from '../entities/Tag.entity'
 import { wrap } from "@mikro-orm/core";
-// import { TagChild } from "src/entities/TagChild.entity";
-// import { TagParent } from "src/entities/TagParent.entity";
-import { TagRelation } from "src/entities/TagRelation.entity";
-import { TagEntity } from "src/entities/TagEntity.entity";
-// import { find } from "rxjs";
-// import { v4 } from 'uuid';
+import { TagRelation } from "../entities/TagRelation.entity";
+import { TagEntity } from "../entities/TagEntity.entity";
 
 
 type MyTemplate1 = {
@@ -59,7 +54,12 @@ export class GroupingService {
     inited: boolean = false // remove, just testing
     constructor(private readonly em: EntityManager) {}
 
-    async createTag(options: any): Promise<any> {
+    async createTag(options: { name: string, description?: string }): Promise<any> {
+        // TODOs:
+       // 1. All tag names must not containe space
+       // 2. All tag names must be in small letters
+       // 3. 
+       
         let em = this.em.fork()
         const opt = {
             name: options.name,
@@ -234,58 +234,6 @@ export class GroupingService {
         group.templateObject = templateObject
         return group
     }
-
-
-    async initTestingFunc() {
-        console.log('Init Fn')
-        if(this.inited) return
-        // TODO: this is just for testing
-   
-           // TODOs:
-           // 1. All tag names must not containe space
-           // 2. All tag names must be in small letters
-           // 3. 
-           await this.createTag({
-               name: 'users',
-               description: 'Users Namespace'
-           })
-   
-           await this.createTag({
-               name: 'users:admins',
-               description: 'Admin Users Namespace'
-           })
-           await this.createTag({
-               name: 'users:admins:support',
-               description: 'Support Admin Users Namespace'
-           })
-           await this.createTag({
-               name: 'users:admins:tech',
-               description: 'Tech Admin Users Namespace'
-           })
-   
-           await this.createTag({
-               name: 'users:organisations',
-               description: 'Organisation Users Namespace'
-           })
-   
-           await this.createTag({
-               name: 'users:organisations:fintechs',
-               description: 'Fintech Organisation Users Namespace'
-           })
-           await this.createTag({
-               name: 'users:organisations:schools',
-               description: 'School Organisation Users Namespace'
-           })
-   
-           
-           let userTag = await this.query('users')
-           let adminUsersTag = await this.query('users:admins')
-
-            userTag = await this.addEntities(userTag.id, [{ id: 'user1'}, { id: 'user2'}, { id: 'user3'}, { id: 'user4'}, { id: 'user5'}])
-            adminUsersTag = await this.addEntities(adminUsersTag.id, [{ id: 'user2'}, { id: 'user4'}])
-
-            this.inited = true
-   }
 
    async playground() {
        // Using the resolver function of a tag

@@ -16,8 +16,8 @@ export class GroupingController {
 
     @Get('get/:name')
     async getTag(@Param() q: any): Promise<any> {
-        await this.groupingService.initTestingFunc()
-        await this.groupingService.playground()
+        // await this.groupingService.initTestingFunc()
+        // await this.groupingService.playground()
         return await this.groupingService.query(q.name)
     }
 
